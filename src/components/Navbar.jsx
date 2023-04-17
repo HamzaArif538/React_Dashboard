@@ -11,20 +11,35 @@ import avatar from '../data/avatar.jpg';
 import { Cart, Chat, Notification, UserProfile } from '.'
 import { useStateContext } from '../contexts/ContextProvider'
 
-const Navbar = () => {
-  const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
-    <TooltipComponent content={title} position='BottomCenter'>
+const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
+  <TooltipComponent content={title} position='BottomCenter'>
       <button type='button' onClick={customFunc} style={ {color} } className='relative text-x1 rounded-full 
       p-3 hover:bg-light-gray'>
         <span style={{ background : dotColor }} className='absolute inline-flex rounded-full h-2 w-2 right-2
-        top-2'>
+        top-2'/>
           {icon}
-        </span>
+        
       </button>
     </TooltipComponent>
   )
+  
+  const Navbar = () => {
+  const {activeMenu, setActiveMenu, isClicked,setIsClicked, handleClick,screenSize, setScreenSize } = useStateContext()
+    useEffect (() => {
+      const handleResize = () => setScreenSize(window.innerWidth)
+      window.addEventListener('resize', handleResize)
+      handleResize()
+      return () => window.removeEventListener('resize', handleResize)
+    }, [] )
 
-  const {activeMenu, setActiveMenu} = useStateContext()
+    useEffect(() => {
+      if(screenSize <= 900) {
+        setActiveMenu(false)
+      } else {
+        setActiveMenu(true)
+      }
+    }, [screenSize])
+
   return (
     <div className='flex justify-between p-2 md:mx-6 relative'>
       <NavButton title={'Menu'} customFunc={() => setActiveMenu((prevActiveMenu) => !prevActiveMenu)} 
@@ -45,9 +60,14 @@ const Navbar = () => {
             <p>
               <span className='text-gray-400 text-14'>Hi,</span> {' '}
               <span className='text-gray-400 font-bold ml-1 text-14'>Hamza</span>
+              
             </p>
         </div>
       </TooltipComponent>
+      {isClicked.cart && <Cart />}
+      {isClicked.chat && <Chat />}
+      {isClicked.notification && <Notification />}
+      {isClicked.userProfile && <UserProfile />}
       </div>
   
     </div>
